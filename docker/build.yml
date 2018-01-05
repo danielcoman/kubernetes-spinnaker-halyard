@@ -1,0 +1,7 @@
+version: '3.3'
+services:
+  halyard-minikube:
+    build:
+      context: ./image
+      dockerfile: ./Dockerfile.minikube
+    image: halyard:minikube

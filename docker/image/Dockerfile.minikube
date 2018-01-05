@@ -1,0 +1,13 @@
+FROM gcr.io/spinnaker-marketplace/halyard:stable
+
+RUN apt-get update && apt-get -y install vim net-tools \
+    mkdir -p /root/.kube
+
+# kubectl cluster context
+COPY config /root/.kube/config
+
+# Run script
+COPY entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+
+ENTRYPOINT [ "/entrypoint.sh" ]
