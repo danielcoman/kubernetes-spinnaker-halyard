@@ -1,3 +1,20 @@
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: halyard-service
+  name: halyard-web
+  labels:
+    app: halyard
+spec:
+  type: NodePort
+  ports:
+  - protocol: TCP
+    port: 9000
+    targetPort: 9000
+    name: halyard-gui
+  selector:
+    app: halyard
+---
 apiVersion: apps/v1beta2 # for versions before 1.8.0 use apps/v1beta1
 kind: Deployment
 metadata:
@@ -6,10 +23,10 @@ metadata:
   labels:
     app: halyard
 spec:
-  replicas: 1
   selector:
     matchLabels:
       app: halyard
+  replicas: 1
   template:
     metadata:
       labels:
@@ -23,24 +40,23 @@ spec:
             cpu: 10m
             memory: 512Mi
         ports:
-        - containerPort: 8084
-          name: h8084
         - containerPort: 9000
-          name: h9000
         volumeMounts:
-        - name: hal
-          mountPath: /root/.hal
+        - mountPath: "/root/.hal"
+          name: hal-vol
       volumes:
-      - name: hal
+      - name: hal-vol
         persistentVolumeClaim:
-          claimName: hal
+          claimName: "hal-claim"
 ---
 apiVersion: "v1"
 kind: "PersistentVolumeClaim"
 metadata:
-  name: "hal"
+  namespace: halyard-service
+  name: "hal-claim"
 spec:
-  accessModes: [ "ReadWriteOnce" ]
+  accessModes:
+    - ReadWriteOnce
   resources:
     requests:
       storage: 0.1G
